@@ -1,0 +1,1056 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenboard Premium - V13 (Ultimate V9 Polish)</title>
+    <style>
+    
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
+
+:root {
+    --bg: #020617;
+    --surface: #0f172a;
+    --card: rgba(15, 23, 42, 0.4);
+    --card-hover: rgba(30, 41, 59, 0.6);
+    --border: rgba(37, 99, 235, 0.2);
+    --border-hover: rgba(59, 130, 246, 0.4);
+    
+    --text-main: #ffffff;
+    --text-muted: #94a3b8;
+    
+    --accent: #2563eb;
+    --accent-light: #60a5fa;
+    --accent-glow: rgba(37, 99, 235, 0.4);
+    
+    --emerald: #10b981;
+    --cyan: #06b6d4;
+    --gold: #f59e0b;
+    --purple: #8b5cf6;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background-color: var(--bg); color: var(--text-main); font-family: 'Sora', sans-serif; line-height: 1.6; overflow-x: hidden; }
+
+/* 3D Spatial Background & Tactile Texture */
+.bg-mesh { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: radial-gradient(circle at 15% 30%, rgba(37, 99, 235, 0.08), transparent 35%), radial-gradient(circle at 85% 60%, rgba(99, 102, 241, 0.06), transparent 35%), linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px); background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px; z-index: -3; pointer-events: none; }
+.noise { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E"); z-index: -2; pointer-events: none; }
+
+/* Ambient Orbs */
+.bg-orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.5; z-index: -1; pointer-events: none; animation: pulse-glow 10s infinite alternate; }
+.bg-orb-1 { width: 500px; height: 500px; background: rgba(59, 130, 246, 0.15); top: 15%; right: -10%; }
+.bg-orb-2 { width: 600px; height: 600px; background: rgba(139, 92, 246, 0.12); top: 40%; left: -15%; animation-delay: -2s; }
+.bg-orb-3 { width: 550px; height: 550px; background: rgba(16, 185, 129, 0.12); top: 75%; right: -5%; animation-delay: -4s; }
+
+/* Evolution Cube */
+.cube-wrapper { position: fixed; top: 35%; left: 50%; transform: translate(-50%, -50%); width: 250px; height: 250px; z-index: -1; pointer-events: none; perspective: 1200px; transition: top 1s cubic-bezier(0.22, 1, 0.36, 1), left 1s cubic-bezier(0.22, 1, 0.36, 1); }
+body.is-scrolled .cube-wrapper { top: 15%; left: 82%; opacity: 0.95; }
+.cube-inner-scale { width: 100%; height: 100%; position: relative; transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1); transform: scale(1); }
+body.is-scrolled .cube-inner-scale { transform: scale(0.35); }
+.cube-scene { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; }
+.cube { width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; }
+.cube-face { position: absolute; width: 250px; height: 250px; background: rgba(37, 99, 235, 0.03); border: 1px solid rgba(59, 130, 246, 0.2); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; transition: all 1.5s cubic-bezier(0.22, 1, 0.36, 1); background-image: linear-gradient(rgba(96, 165, 250, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(96, 165, 250, 0.05) 1px, transparent 1px); background-size: 25px 25px; }
+.face-front  { transform: rotateY(0deg) translateZ(125px); } .face-right  { transform: rotateY(90deg) translateZ(125px); } .face-back   { transform: rotateY(180deg) translateZ(125px); } .face-left   { transform: rotateY(-90deg) translateZ(125px); } .face-top    { transform: rotateX(90deg) translateZ(125px); } .face-bottom { transform: rotateX(-90deg) translateZ(125px); }
+.cube-core { position: absolute; width: 60px; height: 60px; top: 95px; left: 95px; background: var(--accent-light); filter: blur(30px); border-radius: 50%; transform: translateZ(0); opacity: 0; transition: all 1.5s cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* The Mobile Details inside the Cube */
+.cube-mobile { position: absolute; width: 90px; height: 180px; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(40px); background: rgba(2, 6, 23, 0.7); border: 2px solid rgba(255,255,255,0.2); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 15px rgba(59, 130, 246, 0.2); backdrop-filter: blur(10px); display: flex; flex-direction: column; padding: 6px; z-index: 10; transition: all 1.5s cubic-bezier(0.22, 1, 0.36, 1); opacity: 0.85; }
+.cm-notch { width: 30px; height: 5px; background: rgba(255,255,255,0.3); border-radius: 10px; margin: 2px auto 8px auto; }
+.cm-card { width: 100%; height: 35px; background: linear-gradient(135deg, rgba(59,130,246,0.4), rgba(16,185,129,0.3)); border-radius: 6px; margin-bottom: 6px; position: relative; overflow: hidden; }
+.cm-line { width: 70%; height: 4px; background: rgba(255,255,255,0.15); border-radius: 4px; margin-bottom: 6px; }
+.cm-line.short { width: 45%; }
+.cm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: auto; }
+.cm-box { height: 25px; background: rgba(255,255,255,0.05); border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); }
+
+/* Orbit Panels */
+.orbit-panel { position: absolute; width: 150px; background: rgba(2, 6, 23, 0.85); border: 1px solid rgba(59, 130, 246, 0.3); backdrop-filter: blur(12px); padding: 12px; border-radius: 8px; opacity: 0; transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1); box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 15px rgba(37, 99, 235, 0.1); transform-style: preserve-3d; }
+.panel-label { font-size: 0.6rem; color: var(--text-muted); letter-spacing: 0.05em; font-weight: 700; margin-bottom: 4px; }
+.panel-value { font-size: 1.4rem; font-weight: 800; color: var(--accent-light); margin-bottom: 6px; line-height: 1; }
+.panel-bar { height: 3px; background: rgba(255,255,255,0.1); width: 100%; border-radius: 2px; overflow: hidden; }
+.panel-fill { height: 100%; background: var(--accent-light); box-shadow: 0 0 5px var(--accent-light); }
+.panel-cv { top: 20px; left: -120px; transform: translateZ(20px) scale(0.8); } .panel-skill { top: 150px; right: -130px; transform: translateZ(50px) scale(0.8); } .panel-path { bottom: -70px; left: 40px; transform: translateZ(80px) scale(0.8); }
+
+/* Stages Evolution */
+.stage-1 .cube-core { opacity: 0; }
+.stage-2 .cube-core { opacity: 0.4; width: 90px; height: 90px; top: 80px; left: 80px; } .stage-2 .cube-face { border: 1px solid rgba(59, 130, 246, 0.35); box-shadow: inset 0 0 20px rgba(37, 99, 235, 0.1); } .stage-2 .panel-cv { opacity: 1; transform: translateZ(60px) scale(1.1); } .stage-2 .cube-mobile { transform: translate(-50%, -50%) translateZ(60px) scale(1.05); border-color: rgba(96, 165, 250, 0.5); opacity: 0.95; }
+.stage-3 .cube-core { opacity: 0.7; width: 130px; height: 130px; top: 60px; left: 60px; } .stage-3 .cube-face { border: 2px solid rgba(96, 165, 250, 0.5); background-color: rgba(37, 99, 235, 0.08); background-image: linear-gradient(rgba(96, 165, 250, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(96, 165, 250, 0.2) 1px, transparent 1px); box-shadow: inset 0 0 40px rgba(37, 99, 235, 0.2); } .stage-3 .panel-cv { opacity: 1; transform: translateZ(60px) scale(1.1); } .stage-3 .panel-skill { opacity: 1; transform: translateZ(80px) scale(1.1); } .stage-3 .cube-mobile { transform: translate(-50%, -50%) translateZ(75px) scale(1.15); border-color: rgba(16, 185, 129, 0.5); box-shadow: 0 10px 40px rgba(16, 185, 129, 0.2); }
+.stage-4 .cube-core { opacity: 1; width: 170px; height: 170px; top: 40px; left: 40px; filter: blur(40px); box-shadow: 0 0 80px var(--accent-light); } .stage-4 .cube-face { border: 2px solid rgba(96, 165, 250, 1); background-color: rgba(37, 99, 235, 0.15); background-image: linear-gradient(rgba(96, 165, 250, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(96, 165, 250, 0.3) 1px, transparent 1px); box-shadow: inset 0 0 80px rgba(37, 99, 235, 0.5), 0 0 20px rgba(96, 165, 250, 0.3); } .stage-4 .panel-cv { opacity: 1; transform: translateZ(60px) scale(1.1); } .stage-4 .panel-skill { opacity: 1; transform: translateZ(80px) scale(1.1); } .stage-4 .panel-path { opacity: 1; transform: translateZ(120px) scale(1.1); } .stage-4 .cube-mobile { transform: translate(-50%, -50%) translateZ(90px) scale(1.25); border-color: rgba(245, 158, 11, 0.6); box-shadow: 0 10px 40px rgba(245, 158, 11, 0.3); }
+
+/* Premium Animations */
+.anim-up { opacity: 0; transform: translateY(60px); transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1), transform 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+.anim-blur { opacity: 0; filter: blur(15px); transform: translateY(30px); transition: opacity 1.4s cubic-bezier(0.22, 1, 0.36, 1), transform 1.4s cubic-bezier(0.22, 1, 0.36, 1), filter 1.4s cubic-bezier(0.22, 1, 0.36, 1); }
+.anim-scale { opacity: 0; transform: scale(0.92); transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1), transform 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+.anim-up.in-view, .anim-blur.in-view, .anim-scale.in-view { opacity: 1; transform: translate(0) scale(1); filter: blur(0); }
+.d-1 { transition-delay: 100ms; } .d-2 { transition-delay: 200ms; } .d-3 { transition-delay: 300ms; } .d-4 { transition-delay: 400ms; } .d-5 { transition-delay: 500ms; } .d-6 { transition-delay: 600ms; } .d-7 { transition-delay: 700ms; }
+
+@keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0px); } }
+@keyframes pulse-glow { 0% { opacity: 0.4; } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.4; } }
+.floating { animation: float 6s ease-in-out infinite; } .floating-slow { animation: float 8s ease-in-out infinite reverse; }
+
+/* Typography & Layout */
+h1, h2, h3, h4, h5 { font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; color: var(--text-main); }
+h1 { font-size: 3.8rem; font-weight: 800; } h2 { font-size: 3.2rem; }
+.text-gradient-accent { background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.section-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700; color: var(--accent-light); margin-bottom: 1rem; display: inline-block; }
+.section-label.purple { color: var(--purple); } .section-label.emerald { color: var(--emerald); }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 5; }
+.section { padding: 5rem 0; position: relative; } 
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+
+/* 3D Cards */
+.card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 2.5rem; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    transition: box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05); position: relative; transform-style: preserve-3d;
+}
+.card:hover { border-color: rgba(96, 165, 250, 0.6); box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2), inset 0 0 20px rgba(59, 130, 246, 0.1); transition: box-shadow 0.4s ease, border-color 0.4s ease, transform 0.1s linear !important; z-index: 20; }
+.card::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.08), transparent 40%); opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1; overflow: hidden; clip-path: inset(0 round 20px); }
+.card:hover::before { opacity: 1; }
+.card-bg-icon { position: absolute; right: -20px; bottom: -20px; width: 160px; height: 160px; opacity: 0.04; transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1); pointer-events: none; z-index: 0; background-repeat: no-repeat; background-size: contain; filter: drop-shadow(0 0 10px white); }
+.card:hover .card-bg-icon { opacity: 0.1; transform: scale(1.15) rotate(-5deg); }
+
+/* SVG Background Icons */
+.icon-link { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='white' stroke-width='1.5' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244'/%3E%3C/svg%3E"); }
+.icon-card { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='white' stroke-width='1.5' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z'/%3E%3C/svg%3E"); }
+.icon-file { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='white' stroke-width='1.5' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z'/%3E%3C/svg%3E"); }
+.icon-chart { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='white' stroke-width='1.5' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z'/%3E%3C/svg%3E"); }
+.icon-briefcase { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='white' stroke-width='1.5' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0'/%3E%3C/svg%3E"); }
+
+/* Buttons & Navigation */
+.btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.75rem 1.75rem; border-radius: 10px; font-weight: 600; font-size: 0.95rem; transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s, box-shadow 0.3s, border-color 0.3s; text-decoration: none; cursor: pointer; text-align: center; }
+.btn-primary { background: var(--accent); color: white; border: none; box-shadow: 0 4px 15px var(--accent-glow); } .btn-primary:hover { box-shadow: 0 8px 25px var(--accent-glow); transform: translateY(-2px); }
+.btn-secondary { background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.1); } .btn-secondary:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); }
+.btn-outline { background: transparent; color: var(--text-main); border: 1px solid var(--border-hover); } .btn-outline:hover { background: var(--surface); border-color: var(--text-muted); }
+.magnetic { transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); } .magnetic:hover { transition: transform 0.1s linear; }
+
+.navbar { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: rgba(2, 6, 23, 0.6); backdrop-filter: blur(24px); border-bottom: 1px solid rgba(255,255,255,0.05); padding: 0.8rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+.vnav { position: fixed; left: 1.5rem; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 1.25rem; z-index: 100; padding-left: 10px; }
+.vnav-track { position: absolute; left: 0; top: 6px; bottom: 6px; width: 2px; background: rgba(255,255,255,0.05); z-index: -1; border-radius: 2px; }
+.vnav-lamp { position: absolute; left: -1px; width: 4px; height: 16px; background: var(--accent-light); box-shadow: 0 0 10px var(--accent-light), 0 0 20px var(--accent); border-radius: 4px; z-index: 0; transition: top 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); top: 6px; }
+.vnav-item { position: relative; width: 12px; height: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.vnav-dot { width: 6px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 50%; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1; }
+.vnav-item.active .vnav-dot, .vnav-item:hover .vnav-dot { background: #fff; box-shadow: 0 0 10px #fff; width: 8px; height: 8px; }
+.vnav-label { position: absolute; left: 1.5rem; white-space: nowrap; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(8px); padding: 0.4rem 0.85rem; border-radius: 8px; border: 1px solid var(--border); font-size: 0.75rem; font-weight: 700; color: #fff; letter-spacing: 0.05em; text-transform: uppercase; opacity: 0; transform: translateX(-15px); pointer-events: none; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.vnav-item:hover .vnav-label, .vnav-item.active .vnav-label { opacity: 1; transform: translateX(0); }
+
+/* Badges & Pills */
+.badge { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.35rem 0.85rem; border-radius: 8px; font-size: 0.75rem; font-weight: 700; background: rgba(255,255,255,0.05); border: 1px solid var(--border); }
+.badge-emerald { background: rgba(16, 185, 129, 0.1); color: var(--emerald); border-color: rgba(16, 185, 129, 0.3); }
+.badge-purple { background: rgba(139, 92, 246, 0.1); color: var(--purple); border-color: rgba(139, 92, 246, 0.3); }
+.badge-sm { padding: 0.2rem 0.6rem; font-size: 0.7rem; border-radius: 6px; }
+
+.pills { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.pill { display: inline-block; padding: 0.5rem 1.25rem; border-radius: 99px; font-size: 0.85rem; font-weight: 600; background: var(--card); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; transition: all 0.3s; }
+.pill:hover, .pill.active { background: var(--accent); color: white; border-color: var(--accent-light); box-shadow: 0 4px 15px var(--accent-glow); }
+
+/* Chatbot Widget (Elegant & Minimal) */
+.chatbot-widget { position: fixed; bottom: 30px; right: 30px; z-index: 9999; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.chatbot-bubble { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-light)); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 10px 30px rgba(37, 99, 235, 0.5); display: flex; align-items: center; justify-content: center; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; }
+.chatbot-bubble svg { width: 24px; height: 24px; fill: white; }
+.chatbot-widget:hover .chatbot-bubble { transform: scale(1.1); box-shadow: 0 15px 40px rgba(37, 99, 235, 0.7); }
+.chatbot-status { position: absolute; top: -2px; right: -2px; width: 14px; height: 14px; background: var(--emerald); border-radius: 50%; border: 2px solid var(--bg); box-shadow: 0 0 10px var(--emerald); animation: pulse-glow 2s infinite; }
+.chatbot-tooltip { position: absolute; right: 75px; background: var(--surface); border: 1px solid var(--border); padding: 8px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; color: white; white-space: nowrap; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform: translateX(10px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+.chatbot-widget:hover .chatbot-tooltip { opacity: 1; transform: translateX(0); }
+
+/* V9 Timeline UI (Kept Intact!) */
+.timeline-ui { width: 100%; height: 600px; background: rgba(15, 23, 42, 0.5); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.timeline-track { position: absolute; width: 2px; height: 80%; background: linear-gradient(to bottom, transparent, rgba(59, 130, 246, 0.5), transparent); left: 50%; transform: translateX(-50%); }
+.timeline-node { position: absolute; width: 16px; height: 16px; border-radius: 50%; background: var(--bg); border: 3px solid var(--accent-light); left: 50%; transform: translateX(-50%); z-index: 2; box-shadow: 0 0 20px var(--accent-glow); }
+.timeline-node:nth-child(2) { top: 20%; } .timeline-node:nth-child(3) { top: 50%; border-color: var(--emerald); box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); } .timeline-node:nth-child(4) { top: 80%; border-color: var(--purple); box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
+.timeline-card { position: absolute; width: 260px; background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); padding: 1.25rem; border-radius: 12px; text-align: left; }
+.timeline-card:nth-child(5) { top: 15%; right: 55%; }
+.timeline-card:nth-child(6) { top: 45%; left: 55%; }
+.timeline-card:nth-child(7) { top: 75%; right: 55%; }
+
+/* Coaches UI Empty Space Abstract Icons */
+.course-img { width: 100%; height: 160px; border-radius: 12px; margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(30,58,138,0.5), rgba(6,78,59,0.3)); border: 1px solid rgba(255,255,255,0.05); overflow: hidden; }
+.coach-meta { display: flex; align-items: center; gap: 10px; margin-top: 1rem; margin-bottom: 1.5rem; position: relative; z-index: 2; }
+.coach-avatar { width: 32px; height: 32px; border-radius: 50%; background: #475569; overflow: hidden; border: 2px solid var(--surface); }
+.coach-hero-img { width: 100%; height: 350px; border-radius: 24px; position: relative; background: linear-gradient(135deg, rgba(15, 23, 42, 1), rgba(2, 6, 23, 1)); box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.coach-hero-img::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 30px 30px; opacity: 0.5; }
+.coach-hero-img::after { content: ''; position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%); top: -150px; left: -150px; filter: blur(50px); animation: pulse-glow 8s infinite; pointer-events: none; }
+.coach-avatar-lg { width: 80px; height: 80px; border-radius: 50%; background: #475569; margin: 0 auto 1rem auto; border: 3px solid var(--bg); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+
+/* Minimal Floating Icons in Coaches Hero */
+.abstract-hero-icon { position: absolute; width: 64px; height: 64px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; backdrop-filter: blur(8px); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+.abstract-hero-icon.i1 { top: 25%; left: 30%; animation: float 6s infinite; transform: rotate(-10deg); color: var(--accent-light); }
+.abstract-hero-icon.i2 { bottom: 25%; right: 30%; animation: float 7s infinite reverse; transform: rotate(15deg); color: var(--emerald); }
+.abstract-hero-icon.i3 { top: 40%; right: 40%; animation: float 5s infinite 1s; transform: rotate(5deg); color: var(--gold); }
+
+/* Jobs Abstract UI Montage */
+.abstract-ui-block { width: 100%; height: 450px; border-radius: 24px; margin: 3rem 0; position: relative; background: linear-gradient(135deg, rgba(15, 23, 42, 1), rgba(2, 6, 23, 1)); box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.abstract-ui-block::before { content: ''; position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%); top: -150px; left: -150px; filter: blur(50px); animation: pulse-glow 8s infinite; pointer-events: none; }
+.abstract-ui-block::after { content: ''; position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%); bottom: -100px; right: -50px; filter: blur(40px); animation: pulse-glow 6s infinite reverse; pointer-events: none; }
+.montage-container { width: 100%; height: 100%; position: relative; z-index: 2; perspective: 1200px; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.m-card { position: absolute; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(16px); border-radius: 16px; padding: 1.5rem; box-shadow: 0 15px 35px rgba(0,0,0,0.4); text-align: left; }
+.m-card-1 { width: 260px; top: 15%; left: 8%; animation: float 7s ease-in-out infinite; transform: translateZ(20px); border-top: 1px solid rgba(255,255,255,0.2); border-left: 1px solid rgba(255,255,255,0.2); }
+.m-card-2 { width: 220px; bottom: 12%; right: 10%; animation: float 8s ease-in-out infinite reverse; transform: translateZ(40px); }
+.m-card-3 { width: 320px; z-index: 5; animation: float 6s ease-in-out infinite 1s; box-shadow: 0 25px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(96, 165, 250, 0.3); transform: translateZ(80px); background: rgba(15, 23, 42, 0.85); }
+.m-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-light), var(--accent)); margin-bottom: 1rem; }
+.m-line { height: 8px; border-radius: 4px; background: rgba(255,255,255,0.1); margin-bottom: 8px; }
+.m-line.short { width: 60%; } .m-line.long { width: 90%; }
+.m-btn { margin-top: 1.2rem; height: 36px; border-radius: 8px; background: var(--accent); width: 100%; }
+
+/* Spatial Bento Box */
+.bento-container { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; display: grid; grid-template-columns: 1fr 1.5fr; box-shadow: 0 20px 50px rgba(0,0,0,0.3); transform-style: preserve-3d; }
+.bento-left { padding: 3rem 2.5rem; background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%); position: relative; overflow: hidden; }
+.bento-left::after { content: ''; position: absolute; right: -50px; bottom: -50px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(59,130,246,0.15), transparent 70%); filter: blur(30px); pointer-events: none; }
+.bento-right { padding: 2rem; border-left: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.25rem; }
+.bento-item { display: flex; align-items: center; gap: 1rem; padding: 0.85rem 1.25rem; border-radius: 12px; border: 1px solid transparent; transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1); background: transparent; cursor: pointer; text-align: left; color: var(--text-main); transform: translateZ(5px); }
+.bento-item.active, .bento-item:hover { background: var(--card-hover); border-color: var(--border-hover); transform: translateZ(15px) translateX(5px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+.bento-icon { font-size: 1.25rem; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 12px; transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+.bento-item:hover .bento-icon { transform: scale(1.15) rotate(5deg); background: rgba(59,130,246,0.1); }
+
+/* Pricing Elements */
+.pricing-toggle { display: inline-flex; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 99px; padding: 4px; margin-bottom: 2rem; }
+.pricing-toggle-btn { background: transparent; color: var(--text-muted); border: none; padding: 0.6rem 1.5rem; border-radius: 99px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+.pricing-toggle-btn.active { background: var(--accent); color: white; box-shadow: 0 4px 15px var(--accent-glow); }
+.pricing-bullet { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; font-size: 0.85rem; color: var(--text-main); }
+.pricing-bullet span.check { color: var(--emerald); font-weight: bold; flex-shrink: 0; }
+.pricing-pill { position: absolute; top: -14px; left: 24px; background: #2a2a2a; color: #f59e0b; padding: 4px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 700; border: 1px solid #453b1b; white-space: nowrap; z-index: 10; }
+
+    
+
+/* Lower Footer / Tour End UI */
+.tour-end { padding: 4rem 0; background: linear-gradient(180deg, rgba(15, 23, 42, 0.2) 0%, rgba(2, 6, 23, 0.95) 100%); margin-top: 5rem; position: relative; z-index: 10; border-top: 1px solid rgba(255,255,255,0.05); }
+.built-by { text-align: center; margin-bottom: 5rem; }
+.vz-logo-box { margin: 0 auto 1.5rem auto; display: flex; align-items: center; justify-content: center; }
+.vz-logo-box img { height: 75px; object-fit: contain; }
+
+/* Interactive Final CTA (Riya Avatar & Chat Box) */
+.tour-chat-layout { display: flex; max-width: 900px; margin: 0 auto; gap: 3rem; align-items: flex-start; justify-content: center; }
+.tour-avatar-col { display: flex; flex-direction: column; align-items: center; width: 140px; margin-top: 10px; }
+.tour-avatar { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--surface); padding: 4px; position: relative; box-shadow: 0 0 30px rgba(37, 99, 235, 0.3); background: linear-gradient(135deg, rgba(37, 99, 235, 0.5), rgba(16, 185, 129, 0.5)); }
+.tour-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.tour-avatar .status-dot { position: absolute; bottom: 8px; right: 8px; width: 16px; height: 16px; background: var(--emerald); border-radius: 50%; border: 3px solid var(--bg); }
+
+.tour-chat-col { flex: 1; }
+.tour-chat-bubble { background: rgba(30, 41, 59, 0.5); border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; border-top-left-radius: 4px; font-size: 1.05rem; color: var(--text-main); line-height: 1.6; margin-bottom: 2rem; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+.tour-chat-bubble::before { content: ''; position: absolute; left: -10px; top: 20px; width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-right: 10px solid var(--border); }
+.tour-chat-bubble::after { content: ''; position: absolute; left: -8px; top: 20px; width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-right: 10px solid rgba(30, 41, 59, 0.5); }
+.tour-chat-cursor { display: inline-block; width: 2px; height: 1.1em; background: var(--accent-light); animation: blink 1s infinite; vertical-align: middle; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+.tour-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+.tour-input-group { display: flex; flex-direction: column; gap: 10px; }
+.tour-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+.tour-input-row { display: flex; gap: 10px; }
+.tour-input { flex: 1; background: rgba(2, 6, 23, 0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.8rem 1rem; color: white; font-family: inherit; font-size: 0.95rem; outline: none; transition: border-color 0.3s; }
+.tour-input:focus { border-color: var(--accent-light); }
+.tour-btn-go { background: var(--accent); color: white; border: none; padding: 0 1.2rem; border-radius: 8px; font-weight: 700; cursor: pointer; transition: background 0.3s; }
+.tour-btn-go:hover { background: var(--accent-light); }
+.tour-pills-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.tour-role-pill { background: rgba(2, 6, 23, 0.5); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); padding: 0.6rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
+.tour-role-pill:hover, .tour-role-pill.active { background: rgba(255,255,255,0.05); color: white; border-color: rgba(255,255,255,0.3); }
+.tour-action-row { display: flex; align-items: center; gap: 1.5rem; margin-top: 1rem; }
+
+/* Hide Cube elegantly when reaching bottom (stage-5) */
+.stage-5 { opacity: 0 !important; pointer-events: none; transition: opacity 0.8s ease; }
+
+    </style>
+</head>
+<body>
+    <div class="bg-mesh"></div>
+    <div class="noise"></div>
+    
+    <!-- Ambient Space Fillers -->
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+
+    <div class="cube-wrapper stage-1">
+        <div class="cube-inner-scale">
+            <div class="cube-scene" id="cube-scene">
+                <!-- THE CUBE -->
+                <div class="cube">
+                    <div class="cube-face face-front"></div>
+                    <div class="cube-face face-back"></div>
+                    <div class="cube-face face-right"></div>
+                    <div class="cube-face face-left"></div>
+                    <div class="cube-face face-top"></div>
+                    <div class="cube-face face-bottom"></div>
+                    
+                    <!-- THE MOBILE INSIDE CUBE (V9 Style) -->
+                    <div class="cube-mobile">
+                        <div class="cm-notch"></div>
+                        <div class="cm-card" style="height: 45px;"></div>
+                        <div class="cm-line long"></div>
+                        <div class="cm-line short"></div>
+                        <div class="cm-grid">
+                            <div class="cm-box"></div><div class="cm-box"></div>
+                            <div class="cm-box"></div><div class="cm-box"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="cube-core"></div>
+                </div>
+                
+                <div class="orbit-panel panel-cv">
+                    <div class="panel-label">CV STRENGTH:</div>
+                    <div class="panel-value">92%</div>
+                    <div class="panel-bar"><div class="panel-fill" style="width:92%"></div></div>
+                </div>
+                <div class="orbit-panel panel-skill">
+                    <div class="panel-label">SKILL SCORE:</div>
+                    <div class="panel-value">88%</div>
+                    <div class="panel-bar"><div class="panel-fill" style="width:88%"></div></div>
+                </div>
+                <div class="orbit-panel panel-path">
+                    <div class="panel-label">CAREER PATH:</div>
+                    <div class="panel-value" style="color: var(--emerald); font-size: 1.2rem; margin-top: 4px;">OPTIMIZED</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLEAN FLOATING CHATBOT WIDGET -->
+    <div class="chatbot-widget">
+        <div class="chatbot-tooltip">Need help? Chat with us</div>
+        <div class="chatbot-bubble">
+            <div class="chatbot-status"></div>
+            <!-- Elegant chat icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Desktop Header -->
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,0.12)" stroke-width="2.2" fill="none"/>
+                <circle cx="12" cy="12" r="9" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-dasharray="44.1 56.5" transform="rotate(-90 12 12)" stroke="var(--accent-light)"/>
+                <path d="M8.5 8.5 L15.5 8.5 L8.5 15.5 L15.5 15.5" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span style="font-weight: 800; font-size: 1.15rem;">zenboard</span>
+            <span class="badge badge-emerald badge-sm">
+                <span style="width: 5px; height: 5px; background: var(--emerald); border-radius: 50%; display: inline-block;"></span>LIVE
+            </span>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <a href="#" style="color: var(--text-main); text-decoration: none; font-weight: 600; font-size: 0.85rem;">Sign in</a>
+            <a href="#" class="btn btn-primary magnetic" style="padding: 0.5rem 1rem;">Get started free</a>
+        </div>
+    </header>
+
+    <!-- Desktop V-Nav -->
+    <div class="vnav">
+        <div class="vnav-track"></div>
+        <div class="vnav-lamp" id="vnav-lamp"></div>
+        <div class="vnav-item active" data-target="welcome"><div class="vnav-dot"></div><div class="vnav-label">Welcome</div></div>
+        <div class="vnav-item" data-target="how-it-works"><div class="vnav-dot"></div><div class="vnav-label">How it works</div></div>
+        <div class="vnav-item" data-target="why"><div class="vnav-dot"></div><div class="vnav-label">Why Zenboard</div></div>
+        <div class="vnav-item" data-target="jobs"><div class="vnav-dot"></div><div class="vnav-label">Jobs & Gigs</div></div>
+        <div class="vnav-item" data-target="cv"><div class="vnav-dot"></div><div class="vnav-label">Your CV</div></div>
+        <div class="vnav-item" data-target="story"><div class="vnav-dot"></div><div class="vnav-label">Your Story</div></div>
+        <div class="vnav-item" data-target="pitch"><div class="vnav-dot"></div><div class="vnav-label">Pitch</div></div>
+        <div class="vnav-item" data-target="courses"><div class="vnav-dot"></div><div class="vnav-label">Courses</div></div>
+        <div class="vnav-item" data-target="certificates"><div class="vnav-dot"></div><div class="vnav-label">Certificates</div></div>
+        <div class="vnav-item" data-target="coaches"><div class="vnav-dot"></div><div class="vnav-label">Coaches</div></div>
+        <div class="vnav-item" data-target="scores"><div class="vnav-dot"></div><div class="vnav-label">Your Scores</div></div>
+        <div class="vnav-item" data-target="pricing"><div class="vnav-dot"></div><div class="vnav-label">Pricing</div></div>
+    </div>
+
+    <main>
+        <!-- WELCOME SECTION -->
+        <section id="welcome" class="section" style="padding-top: 7rem; padding-bottom: 2rem;">
+            <div class="container" style="text-align: center;">
+                <div class="badge anim-up" style="margin-bottom: 1.5rem;">🇮🇳 India's first live career scoreboard</div>
+                <h1 class="anim-blur d-1" style="margin-bottom: 1rem;">Find work that fits.<br><span class="text-gradient-accent">Grow into who you want to be.</span></h1>
+                <p class="anim-up d-2" style="font-size: 1.15rem; color: var(--text-muted); max-width: 850px; margin: 0 auto 2.5rem auto;">A living profile that shows you at your best, internships and jobs matched to you, an honest read on how well you fit each - and coaches to level you up.</p>
+                
+                <div class="anim-up d-3" style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 3.5rem;">
+                    <a href="#" class="btn btn-primary magnetic">Get started free</a>
+                    <a href="#" class="btn btn-outline magnetic">Browse jobs & internships</a>
+                </div>
+
+                <div class="bento-container anim-scale d-4 floating">
+                    <div class="bento-left" style="text-align: left;">
+                        <div style="font-weight: 800; font-size: 1.5rem; margin-bottom: 0.25rem;">Riya</div>
+                        <div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;">Your Zenboard guide</div>
+                        <h3 style="font-size: 2rem; margin-bottom: 1rem;">5 things decide whether you <span style="color: var(--accent-light);">get hired.</span></h3>
+                        <p style="color: var(--text-muted); font-size: 0.95rem;">Zenboard reads all five and tells you where you stand. Pick the one to start with.</p>
+                    </div>
+                    <div class="bento-right">
+                        <button class="bento-item active magnetic"><div class="bento-icon">📄</div><div><div style="font-weight: 700;">Improve your CV</div><div style="font-size: 0.8rem; color: var(--text-muted);">Presentation <span style="color:var(--accent-light); font-weight:bold;">→</span> your CV and profile</div></div></button>
+                        <button class="bento-item magnetic"><div class="bento-icon">🎤</div><div><div style="font-weight: 700;">Practise your interview</div><div style="font-size: 0.8rem; color: var(--text-muted);">Pitch <span style="color:var(--accent-light); font-weight:bold;">→</span> how you come across</div></div></button>
+                        <button class="bento-item magnetic"><div class="bento-icon">✅</div><div><div style="font-weight: 700;">Close your skill gaps</div><div style="font-size: 0.8rem; color: var(--text-muted);">Preparation <span style="color:var(--accent-light); font-weight:bold;">→</span> the gap, closed</div></div></button>
+                        <button class="bento-item magnetic"><div class="bento-icon">🎯</div><div><div style="font-weight: 700;">Know if this role fits you</div><div style="font-size: 0.8rem; color: var(--text-muted);">Fitment <span style="color:var(--accent-light); font-weight:bold;">→</span> right for this role</div></div></button>
+                        <button class="bento-item magnetic"><div class="bento-icon">✨</div><div><div style="font-weight: 700;">See where you stand on AI</div><div style="font-size: 0.8rem; color: var(--text-muted);">AI fluency <span style="color:var(--accent-light); font-weight:bold;">→</span> how you work with AI</div></div></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOW ZENBOARD WORKS -->
+        <section id="how-it-works" class="section">
+            <div class="container text-center">
+                <h2 class="anim-blur d-1" style="font-size: 2.8rem; margin-bottom: 0.5rem;">How Zenboard works</h2>
+                <p class="anim-up d-2" style="font-size: 1.15rem; color: var(--text-muted); margin-bottom: 3rem;">Three steps <span style="color:var(--accent-light); font-weight:bold;">→</span> and the five things they act on.</p>
+                
+                <div class="grid-3" style="text-align: left;">
+                    <div class="card anim-scale d-3">
+                        <div class="card-bg-icon icon-file"></div>
+                        <div style="font-size: 2rem; margin-bottom: 1rem; position:relative; z-index:2;">📜</div>
+                        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; position:relative; z-index:2;">Show up properly</h3>
+                        <p style="color: var(--text-muted); font-size: 0.95rem; position:relative; z-index:2;">Your CV becomes a living profile <span style="color:var(--accent-light); font-weight:bold;">→</span> five layouts, a card, one link to share.</p>
+                    </div>
+                    <div class="card anim-scale d-4">
+                        <div class="card-bg-icon icon-chart"></div>
+                        <div style="font-size: 2rem; margin-bottom: 1rem; position:relative; z-index:2;">📊</div>
+                        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; position:relative; z-index:2;">See what is missing</h3>
+                        <p style="color: var(--text-muted); font-size: 0.95rem; position:relative; z-index:2;">Private scores, a pitch you can record and watch back, and the gap named in plain words.</p>
+                    </div>
+                    <div class="card anim-scale d-5">
+                        <div class="card-bg-icon icon-briefcase"></div>
+                        <div style="font-size: 2rem; margin-bottom: 1rem; position:relative; z-index:2;">💼</div>
+                        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; position:relative; z-index:2;">Close it, then get the work</h3>
+                        <p style="color: var(--text-muted); font-size: 0.95rem; position:relative; z-index:2;">Certified coaches and their avatars to fix the gap <span style="color:var(--accent-light); font-weight:bold;">→</span> then the work itself.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WHY ZENBOARD -->
+        <section id="why" class="section">
+            <div class="container text-center">
+                <span class="section-label anim-up">Why Zenboard exists</span>
+                <h2 class="anim-blur d-1" style="font-size: 2.8rem;">You applied. You heard nothing.<br><span class="text-gradient-accent">Nobody told you which part let you down.</span></h2>
+                
+                <div class="anim-up d-2" style="margin-top: 4rem; text-align: left;">
+                    <div class="card" style="margin-bottom: 2rem;">
+                        <p style="font-size: 1.15rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+                            <strong style="color: white;">Job boards</strong> give you listings. <strong style="color: white;">Internship sites</strong> give you internships. <strong style="color: white;">Professional networks</strong> give you contacts. <strong style="color: white;">Course platforms</strong> give you courses.
+                        </p>
+                        <p style="font-size: 1.35rem; font-weight: 700; margin-bottom: 1.5rem;">
+                            None of them tells you what stands between you and the work you want <span style="color:var(--accent-light); font-weight:bold;">→</span> <span style="color: var(--accent-light);">or gives you the means to fix it.</span>
+                        </p>
+                        <p style="color: var(--text-muted); font-size: 0.95rem;">Free to start. Where you stand stays free.</p>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="card anim-scale d-3">
+                            <h3 style="font-size: 1.4rem; margin-bottom: 0.5rem; position: relative; z-index: 2;">Work comes in more shapes than one</h3>
+                            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; position: relative; z-index: 2;">Companies here post the smaller shapes too <span style="color:var(--accent-light); font-weight:bold;">→</span> the ones that pay while you look.</p>
+                            <div class="pills" style="position: relative; z-index: 2;">
+                                <span class="pill magnetic">Full-time</span> <span class="pill magnetic">Part-time</span> <span class="pill magnetic">Internships</span>
+                                <span class="pill magnetic">Contract</span> <span class="pill magnetic">Freelance & gigs</span> <span class="pill magnetic">Remote / WFH</span>
+                            </div>
+                        </div>
+                        <div class="card anim-scale d-4">
+                            <h3 style="font-size: 1.4rem; margin-bottom: 0.5rem; position: relative; z-index: 2;">Or build something that earns while you sleep</h3>
+                            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2.5rem; position: relative; z-index: 2;">Publish a layout, a card design or a tool other people pay to use. Build it once; it keeps earning.</p>
+                            <a href="#" style="color: var(--accent-light); font-weight: 700; text-decoration: none; display: inline-block; position: relative; z-index: 2;" class="magnetic">See what you could build <span style="font-weight:bold;">→</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- JOBS -->
+        <section id="jobs" class="section">
+            <div class="container text-center">
+                <span class="section-label anim-up">Employment & Jobs</span>
+                <h2 class="anim-blur d-1" style="font-size: 3.5rem;">Internships. Jobs. Gigs.</h2>
+                <p class="anim-up d-2" style="font-size: 1.15rem; color: var(--text-muted); max-width: 650px; margin: 1rem auto 2rem auto;">
+                    Full-time, part-time, WFH, contract or freelance <span style="color:var(--accent-light); font-weight:bold;">→</span> apply to real roles, or pick up paid work and start building something of your own.
+                </p>
+                
+                <!-- JOBS MONTAGE UI (V9) -->
+                <div class="abstract-ui-block anim-scale d-4">
+                    <div class="montage-container">
+                        <div class="m-card m-card-1">
+                            <div class="m-avatar" style="background: url('https://i.pravatar.cc/100?img=1'); background-size:cover;"></div>
+                            <div class="m-line long"></div><div class="m-line short"></div>
+                        </div>
+                        <div class="m-card m-card-3">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                                <div style="font-weight:700; font-size:1.1rem; color:white;">Frontend Developer</div>
+                                <span class="badge badge-emerald badge-sm">98% MATCH</span>
+                            </div>
+                            <div class="m-line long"></div>
+                            <div class="m-line"></div>
+                            <div class="m-line short"></div>
+                            <div class="m-btn"></div>
+                        </div>
+                        <div class="m-card m-card-2">
+                            <div style="font-size: 2rem; margin-bottom: 8px;">📈</div>
+                            <div style="font-weight:600; font-size:0.9rem; color:white; margin-bottom:8px;">Market Demand</div>
+                            <div style="display:flex; gap:4px; align-items:flex-end; height: 30px;">
+                                <div style="width:20%; height:40%; background:rgba(255,255,255,0.2); border-radius:2px;"></div>
+                                <div style="width:20%; height:70%; background:rgba(255,255,255,0.2); border-radius:2px;"></div>
+                                <div style="width:20%; height:100%; background:var(--accent-light); border-radius:2px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="anim-blur d-5" style="margin-top: 3rem;">
+                    <div class="pills" style="justify-content: center; margin-bottom: 2rem;">
+                        <span class="pill active magnetic">Internship</span> <span class="pill magnetic">Full-time</span> <span class="pill magnetic">Part-time</span>
+                        <span class="pill magnetic">WFH</span> <span class="pill magnetic">Contract</span> <span class="pill magnetic">Freelance</span>
+                    </div>
+                    <div class="section-label" style="color: var(--text-muted);">OPEN RIGHT NOW</div>
+                    
+                    <div class="job-card magnetic anim-up d-6">
+                        <div>
+                            <h4 style="font-size: 1.1rem; margin-bottom: 0.25rem;">QA Engineer (Manual / Exploratory) <span style="color:var(--accent-light);">•</span> Internship <span class="badge" style="margin-left: 0.5rem; background: rgba(59, 130, 246, 0.2); color: var(--accent-light); border:none;">Internship</span></h4>
+                            <p style="color: var(--text-muted); font-size: 0.85rem;">Viewzen Labs · Remote</p>
+                        </div>
+                        <button class="btn btn-primary magnetic">Read the role</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- CV LINK -->
+        <section id="cv" class="section">
+            <div class="container text-center">
+                <span class="section-label anim-up">What you walk away with</span>
+                <h2 class="anim-blur d-1" style="font-size: 3.5rem;">A CV you send as a link.</h2>
+                <p class="anim-up d-2" style="font-size: 1.15rem; color: var(--text-muted); max-width: 600px; margin: 1rem auto 3rem auto;">
+                    An attachment goes stale the moment you send it. Your link is current every time somebody looks.
+                </p>
+                
+                <div class="grid-2" style="text-align: left; margin-bottom: 3rem;">
+                    <div class="card anim-scale d-3">
+                        <div class="card-bg-icon icon-link"></div>
+                        <span class="section-label" style="color: var(--accent-light); position: relative; z-index: 2;">Your link</span>
+                        <h3 style="font-size: 1.4rem; margin-bottom: 0.75rem; position: relative; z-index: 2;">zenboard.in/in/your-name</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; position: relative; z-index: 2;">One address holding your whole professional story, updating itself as you do. A paid plan carries your name: a free one works too, as a long random address.</p>
+                    </div>
+                    <div class="card anim-scale d-4">
+                        <div class="card-bg-icon icon-card"></div>
+                        <span class="section-label" style="color: var(--cyan); position: relative; z-index: 2;">Your card</span>
+                        <h3 style="font-size: 1.4rem; margin-bottom: 0.75rem; position: relative; z-index: 2;">Add /card and it's a business card</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; position: relative; z-index: 2;">The same link with /card opens your digital business card <span style="color:var(--accent-light); font-weight:bold;">→</span> face, role, and a way to reach you. Nothing to print, nothing to run out of.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- TIMELINE STORY (Restored V9 + Pill Layout Selectors) -->
+        <section id="story" class="section">
+            <div class="container text-center">
+                <div class="section-label anim-up">YOUR STORY, IN 5 WAYS</div>
+                <h2 class="anim-blur d-1" style="font-size: 3.5rem; margin-bottom: 1.5rem;">A timeline that builds itself.</h2>
+                <p class="anim-up d-2" style="font-size: 1.15rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 3rem auto;">
+                    Drop in where you've been. Zenboard renders it as a living timeline. Preview it in 5 unique layouts, automatically.
+                </p>
+
+                <!-- Added Layout Pills as requested -->
+                <div class="pills anim-blur d-3" style="justify-content: center; margin-bottom: 2rem;">
+                    <span class="pill active magnetic">Roadmap</span>
+                    <span class="pill magnetic">Magazine</span>
+                    <span class="pill magnetic">Bubble</span>
+                    <span class="pill magnetic">Staircase</span>
+                    <span class="pill magnetic">Compartment</span>
+                </div>
+                
+                <!-- Kept the exact original illustration from V9 -->
+                <div class="timeline-ui anim-scale d-4 floating">
+                    <div class="timeline-track"></div>
+                    <div class="timeline-node"></div>
+                    <div class="timeline-node"></div>
+                    <div class="timeline-node"></div>
+                    
+                    <div class="timeline-card">
+                        <div style="font-size: 0.8rem; color: var(--accent-light); margin-bottom: 4px; font-weight: 700;">2023 - Present</div>
+                        <div style="font-weight: 700; margin-bottom: 2px;">Senior Designer</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">Viewzen Labs</div>
+                    </div>
+                    <div class="timeline-card">
+                        <div style="font-size: 0.8rem; color: var(--emerald); margin-bottom: 4px; font-weight: 700;">2021 - 2023</div>
+                        <div style="font-weight: 700; margin-bottom: 2px;">UI/UX Designer</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">Tech Corp</div>
+                    </div>
+                    <div class="timeline-card">
+                        <div style="font-size: 0.8rem; color: var(--purple); margin-bottom: 4px; font-weight: 700;">2019 - 2021</div>
+                        <div style="font-weight: 700; margin-bottom: 2px;">Design Degree</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">Design Institute</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PITCH -->
+        <section id="pitch" class="section">
+            <div class="container text-center">
+                <span class="section-label purple anim-up">PITCH</span>
+                <h2 class="anim-blur d-1" style="font-size: 2.8rem; margin-bottom: 1.5rem;">The part you only get to do once.</h2>
+                <div class="grid-3" style="text-align: left; margin-top: 3rem;">
+                    <div class="card anim-scale d-3">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h3 style="font-size: 1.25rem;">On your own</h3>
+                            <span class="badge badge-purple badge-sm">WITH AI</span>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Record your self-intro and your answers, as many takes as you like, and see what a listener actually hears. Nobody is watching.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COURSES -->
+        <section id="courses" class="section">
+            <div class="container text-center">
+                <span class="section-label purple anim-up">COURSES</span>
+                <h2 class="anim-blur d-1" style="font-size: 2.8rem; margin-bottom: 1.5rem;">Get coached by someone who's done it.</h2>
+                <p class="anim-up d-2" style="font-size: 1.15rem; color: var(--text-muted); max-width: 800px; margin: 0 auto 1.5rem auto;">
+                    Structured courses from experienced professionals <span style="color:var(--accent-light); font-weight:bold;">→</span> worked through chapter by chapter, in your own time. Look inside any of them first: the chapters, the coach, a video, what it costs.
+                </p>
+                <p class="anim-up d-3" style="font-size: 1.05rem; color: var(--text-main); margin-bottom: 3rem;">
+                    You pay one chapter at a time, not a lump sum up front.
+                </p>
+                
+                <div class="grid-3" style="text-align: left;">
+                    <div class="card anim-scale d-4">
+                        <div class="course-img"></div>
+                        <div style="display: flex; gap: 10px; margin-bottom: 1rem;">
+                            <span class="badge badge-sm" style="background: rgba(255,255,255,0.1);">INDEPENDENT</span>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; display: flex; align-items: center;">2 chapters</span>
+                        </div>
+                        <h3 style="font-size: 1.3rem; margin-bottom: 0.75rem;">Lean Six Sigma</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">You'll master the core principles and tools of Lean Six Sigma to identify inefficiencies, eliminate waste, and...</p>
+                        
+                        <div class="coach-meta">
+                            <div class="coach-avatar"></div>
+                            <span style="font-size: 0.85rem; color: var(--text-main); font-weight: 600;">Coach</span>
+                        </div>
+                        
+                        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem;">Starts at <strong style="color: white; font-size: 1rem;">₹1,000</strong> for the first chapter</p>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Whole course ₹1,000</p>
+                            <a href="#" class="magnetic" style="font-size: 0.8rem; color: var(--text-muted); text-decoration: none; display: inline-block;">See the full course <span style="font-weight:bold; margin-left:4px;">→</span></a>
+                        </div>
+                    </div>
+                    
+                    <div class="card anim-scale d-5">
+                        <div class="course-img" style="background: linear-gradient(135deg, rgba(6,182,212,0.5), rgba(30,58,138,0.3));"></div>
+                        <div style="display: flex; gap: 10px; margin-bottom: 1rem;">
+                            <span class="badge badge-sm" style="background: rgba(255,255,255,0.1);">INDEPENDENT</span>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; display: flex; align-items: center;">5 sessions</span>
+                        </div>
+                        <h3 style="font-size: 1.3rem; margin-bottom: 0.75rem;">How to network</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">You'll learn the fundamentals of building genuine professional relationships and navigating networking...</p>
+                        
+                        <div class="coach-meta">
+                            <div class="coach-avatar"></div>
+                            <span style="font-size: 0.85rem; color: var(--text-main); font-weight: 600;">Inder Kumar</span>
+                        </div>
+                        
+                        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem;">Starts at <strong style="color: white; font-size: 1rem;">₹65</strong> for the first session</p>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Whole course ₹500</p>
+                            <a href="#" class="magnetic" style="font-size: 0.8rem; color: var(--text-muted); text-decoration: none; display: inline-block;">See the full course <span style="font-weight:bold; margin-left:4px;">→</span></a>
+                        </div>
+                    </div>
+                    
+                    <div class="card anim-scale d-6">
+                        <div class="course-img" style="background: linear-gradient(135deg, rgba(16,185,129,0.3), rgba(30,58,138,0.5));"></div>
+                        <div style="display: flex; gap: 10px; margin-bottom: 1rem;">
+                            <span class="badge badge-sm" style="background: rgba(255,255,255,0.1);">INDEPENDENT</span>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; display: flex; align-items: center;">4 chapters</span>
+                        </div>
+                        <h3 style="font-size: 1.3rem; margin-bottom: 0.75rem;">Course on health research portal</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">This is about getting a health proposal submitted and approved by the ethics committee</p>
+                        
+                        <div class="coach-meta">
+                            <div class="coach-avatar"></div>
+                            <span style="font-size: 0.85rem; color: var(--text-main); font-weight: 600;">Anuj Bhati</span>
+                        </div>
+                        
+                        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem;">Starts at <strong style="color: white; font-size: 1rem;">₹200</strong> for the first chapter</p>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Whole course ₹1,000</p>
+                            <a href="#" class="magnetic" style="font-size: 0.8rem; color: var(--text-muted); text-decoration: none; display: inline-block;">See the full course <span style="font-weight:bold; margin-left:4px;">→</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CERTIFICATES -->
+        
+
+<section id="certificates" class="section">
+            <div class="container text-center">
+                <span class="section-label emerald anim-up">COACHING THAT LEAVES A RECORD</span>
+                <h2 class="anim-blur d-1" style="font-size: 2.8rem; margin-bottom: 1.5rem;">A certificate someone can actually check.</h2>
+                <p class="anim-up d-2" style="font-size: 1.15rem; color: var(--text-muted); max-width: 800px; margin: 0 auto 3rem auto;">
+                    Finish a course and your coach issues a certificate <span style="color:var(--accent-light); font-weight:bold;">→</span> with a code and QR that lead to a Zenboard page. A certificate nobody can verify is decoration.
+                </p>
+                <div class="grid-3" style="text-align: left; margin-bottom: 3rem;">
+                    <div class="card anim-scale d-3">
+                        <div class="card-bg-icon icon-shield"></div>
+                        <h3 style="font-size: 1.25rem; margin-bottom: 1rem; position:relative; z-index:2;">Checked, not claimed</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; position:relative; z-index:2;">Anyone you send it to confirms it in one scan. You decide whether it can be checked publicly.</p>
+                    </div>
+                    <div class="card anim-scale d-4">
+                        <div class="card-bg-icon icon-star"></div>
+                        <h3 style="font-size: 1.25rem; margin-bottom: 1rem; position:relative; z-index:2;">Who taught you matters</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; position:relative; z-index:2;">A certificate is worth what the person behind it is worth. Coaches here show their track record <span style="color:var(--accent-light); font-weight:bold;">→</span> years, clients, what people said.</p>
+                    </div>
+                    <div class="card anim-scale d-5">
+                        <div class="card-bg-icon icon-card"></div>
+                        <h3 style="font-size: 1.25rem; margin-bottom: 1rem; position:relative; z-index:2;">Credentials a person here checked</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; position:relative; z-index:2;">We look an ICF credential up on ICF's own register, and confirm EMCC with the body directly. What nobody has checked never wears a mark.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COACHES HERO GRID -->
+        <section id="coaches" class="section">
+            <div class="container text-center">
+                <button class="btn btn-outline magnetic anim-up d-1" style="border-radius: 99px; margin-bottom: 3rem; border-color: rgba(16, 185, 129, 0.5); color: white;">Find a coach <span style="font-weight:bold; margin-left:4px;">→</span></button>
+                
+                <div class="coach-hero-img anim-scale d-2 floating-slow">
+                    <!-- Clean Abstract Icon Montage to fill the space without ruining V9 aesthetic -->
+                    <div class="abstract-hero-icon i1">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <div class="abstract-hero-icon i2">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                    </div>
+                    <div class="abstract-hero-icon i3">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    </div>
+                </div>
+                
+                <div class="grid-3" style="margin-top: -3.5rem; position: relative; z-index: 5;">
+                    <div class="card anim-up d-3" style="text-align: center;">
+                        <div class="coach-avatar-lg"></div>
+                        <h3 style="font-size: 1.25rem; margin-bottom: 0.2rem;">Kabir Menon</h3>
+                        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1rem;">Ex-Google - System Design</p>
+                        <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:8px; margin-bottom: 1.5rem;">
+                            <span class="badge badge-sm" style="border-color: rgba(59,130,246,0.3); color: var(--accent-light);">Interview prep</span>
+                            <span class="badge badge-sm" style="border-color: rgba(59,130,246,0.3); color: var(--accent-light);">DSA</span>
+                        </div>
+                        <p style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.05em;">1:1 <span style="color:var(--accent-light);">•</span> COURSE</p>
+                    </div>
+                    
+                    <div class="card anim-up d-4" style="text-align: center;">
+                        <div class="coach-avatar-lg" style="background: #334155;"></div>
+                        <h3 style="font-size: 1.25rem; margin-bottom: 0.2rem;">Meera Iyer</h3>
+                        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1rem;">Product Leader - 12 yrs</p>
+                        <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:8px; margin-bottom: 1.5rem;">
+                            <span class="badge badge-sm" style="border-color: rgba(59,130,246,0.3); color: var(--accent-light);">PM breaking-in</span>
+                            <span class="badge badge-sm" style="border-color: rgba(59,130,246,0.3); color: var(--accent-light);">Case prep</span>
+                        </div>
+                        <p style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.05em;">RETAINER</p>
+                    </div>
+
+                    <div class="card anim-up d-5" style="text-align: center;">
+                        <div class="coach-avatar-lg" style="background: #1e293b;"></div>
+                        <h3 style="font-size: 1.25rem; margin-bottom: 0.2rem;">Vikram Rao</h3>
+                        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1rem;">Frontend Architect</p>
+                        <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:8px; margin-bottom: 1.5rem;">
+                            <span class="badge badge-sm" style="border-color: rgba(59,130,246,0.3); color: var(--accent-light);">React</span>
+                            <span class="badge badge-sm" style="border-color: rgba(59,130,246,0.3); color: var(--accent-light);">Portfolio review</span>
+                        </div>
+                        <p style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.05em;">1:1</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCORES -->
+        <section id="scores" class="section">
+            <div class="container text-center">
+                <span class="section-label anim-up">Scores</span>
+                <h2 class="anim-blur d-1" style="font-size: 2.8rem;">Every time they update, <br><span class="text-gradient-accent">you get an email.</span></h2>
+            </div>
+        </section>
+
+        <!-- PRICING -->
+        <section id="pricing" class="section">
+            <div class="container text-center">
+                <div class="pricing-toggle anim-blur">
+                    <button class="pricing-toggle-btn active magnetic">For candidates</button>
+                    <button class="pricing-toggle-btn magnetic">For coaches</button>
+                    <button class="pricing-toggle-btn magnetic">For companies</button>
+                </div>
+                
+                <h4 class="anim-up d-1" style="font-size: 0.7rem; color: var(--accent-light); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem;">IF YOU'RE LOOKING FOR WORK</h4>
+                <p class="anim-up d-2" style="color: var(--text-muted); margin-bottom: 3.5rem; font-size: 1rem;">Start free. Pay once if you want your whole CV done, or go straight to a yearly plan.</p>
+                
+                <div class="grid-3" style="align-items: stretch;">
+                    <!-- Free -->
+                    <div class="card anim-scale d-3" style="text-align: left; display: flex; flex-direction: column;">
+                        <div class="section-label" style="color: var(--text-muted);">FREE</div>
+                        <div style="font-size: 2.8rem; font-weight: 800; line-height: 1; margin-bottom: 1.5rem; color: white;">₹0<span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 600;"> / forever</span></div>
+                        
+                        <div style="flex-grow: 1;">
+                            <div class="pricing-bullet"><span class="check">✓</span> <span>Live profile (Roadmap layout)</span></div>
+                            <div class="pricing-bullet"><span class="check">✓</span> <span>One part of your CV improved: free</span></div>
+                            <div class="pricing-bullet"><span class="check">✓</span> <span>Coming soon <span style="color:var(--accent-light); font-weight:bold;">→</span> ₹50 once for your whole CV read</span></div>
+                            <div class="pricing-bullet"><span class="check">✓</span> <span>1 role profile <span style="color:var(--accent-light); font-weight:bold;">→</span> the profile you share</span></div>
+                            <div class="pricing-bullet"><span class="check">✓</span> <span>Apply to jobs & internships</span></div>
+                            <div class="pricing-bullet"><span class="check">✓</span> <span>Public shareable link</span></div>
+                        </div>
+                        <button class="btn btn-secondary magnetic" style="width: 100%; margin-top: 2rem;">Start free</button>
+                    </div>
+                    
+                    <!-- Basic -->
+                    <div class="card pricing-card spotlight anim-scale d-4" style="text-align: left; display: flex; flex-direction: column; border-color: rgba(59,130,246,0.3);">
+                        <div class="pricing-pill">Less than a coffee a month</div>
+                        <div class="section-label" style="color: var(--text-main);">BASIC</div>
+                        <div style="font-size: 2.8rem; font-weight: 800; line-height: 1; margin-bottom: 1.5rem; color: white;">₹99<span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 600;"> / per year</span></div>
+                        
+                        <div style="flex-grow: 1;">
+                            <div class="pricing-bullet"><span class="check">✓</span> <span>All 5 layouts</span></div>
+                            <div class="pricing-bullet"><span class="check">✓</span> <span>Name-based slug URL</span></div>
+                            <div class="pricing-bullet"><span class="check">✓</span> <span>Searchable by employers</span></div>
+                            <div class="pricing-bullet"><span class="check">✓</span> <span>Shortlisted by 3 employers at a time</span></div>
+                            <div class="pricing-bullet"><span class="check">✓</span> <span>3 role profiles, each with its own covering letter</span></div>
+                            <div class="pricing-bullet"><span class="check">✓</span> <span>Ongoing AI help with your CV</span></div>
+                        </div>
+                        <button class="btn btn-primary magnetic" style="width: 100%; margin-top: 2rem;">Get Basic <span style="font-weight:bold; margin-left:4px;">→</span></button>
+                    </div>
+                    
+                    <!-- Premium -->
+                    <div class="card anim-scale d-5" style="text-align: left; display: flex; flex-direction: column;">
+                        <div class="pricing-pill">Less than a full meal a month</div>
+                        <div class="section-label" style="color: var(--text-muted);">PREMIUM</div>
+                        <div style="font-size: 2.8rem; font-weight: 800; line-height: 1; margin-bottom: 1.5rem; color: white;">₹499<span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 600;"> / per year</span></div>
+                        
+                        <div style="flex-grow: 1;">
+                            <div class="pricing-bullet"><span class="check">✓</span> <span>Everything in Basic</span></div>
+                            <div class="pricing-bullet"><span class="check">✓</span> <span>Shortlisted by up to 10 employers at the same time</span></div>
+                            <div class="pricing-bullet"><span class="check">✓</span> <span>5 role profiles, plus a letter for one employer with its own link</span></div>
+                            <div class="pricing-bullet"><span class="check">✓</span> <span>Express interest (EOI)</span></div>
+                            <div class="pricing-bullet"><span class="check">✓</span> <span>Market Pulse intelligence</span></div>
+                            <div class="pricing-bullet"><span class="check">✓</span> <span>The deepest AI help we offer</span></div>
+                        </div>
+                        <button class="btn btn-secondary magnetic" style="width: 100%; margin-top: 2rem;">Go Premium</button>
+                    </div>
+                </div>
+                
+                <a href="#" class="anim-up d-6 magnetic" style="display:inline-block; color: var(--accent-light); margin-top: 3rem; text-decoration: none; font-size: 0.9rem; font-weight: 600;">Everything in each plan <span style="font-weight:bold; margin-left:4px;">→</span></a>
+            </div>
+        </section>
+    
+
+        <!-- LOWER TOUR CTA SECTION -->
+        <section id="tour-end" class="tour-end">
+            <div class="container">
+                <!-- Built by ViewZen Labs -->
+                <div class="built-by anim-up d-1">
+                    <div class="vz-logo-box">
+                        <img src="viewzen_logo.png" alt="10/01 ViewZen Labs" />
+                    </div>
+                    <h3 style="font-size: 1.4rem; margin-bottom: 0.75rem;">Built by Viewzen Labs</h3>
+                    <p style="color: var(--text-muted); font-size: 1rem; max-width: 600px; margin: 0 auto 1rem auto;">A software company on a mission to make careers fair and legible in India. What you can do, and the growth ahead of you, should never be a mystery.</p>
+                    <a href="https://viewzenlabs.com" target="_blank" class="magnetic" style="font-size: 0.85rem; color: var(--text-muted); text-decoration: none; display: inline-block;">viewzenlabs.com <span style="font-weight:bold; margin-left:4px;">↗</span></a>
+                </div>
+
+                <!-- Final Interactive Chat CTA -->
+                <div class="tour-chat-layout anim-up d-2">
+                    <!-- Left: Riya Avatar -->
+                    <div class="tour-avatar-col">
+                        <div class="tour-avatar magnetic">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=300&auto=format&fit=crop" alt="Riya">
+                            <div class="status-dot"></div>
+                        </div>
+                        <h4 style="font-size: 1.25rem; margin-top: 1rem; margin-bottom: 0.2rem;">Riya</h4>
+                        <p style="color: var(--text-muted); font-size: 0.8rem;">Your Zenboard guide</p>
+                    </div>
+
+                    <!-- Right: Chat Box & Forms -->
+                    <div class="tour-chat-col">
+                        <div class="tour-chat-bubble">
+                            <span style="color: var(--accent-light); margin-right: 6px;">●</span> That's the tour. Tell me your name and what brings you here — I'll set things up around you from the first screen.<span class="tour-chat-cursor"></span>
+                        </div>
+
+                        <div class="tour-form-grid">
+                            <!-- Name Input -->
+                            <div class="tour-input-group">
+                                <div class="tour-label">What should I call you?</div>
+                                <div class="tour-input-row">
+                                    <input type="text" class="tour-input" placeholder="Your name...">
+                                    <button class="tour-btn-go magnetic">Go <span style="margin-left:4px; font-size:0.8rem;">→</span></button>
+                                </div>
+                            </div>
+                            
+                            <!-- Role Selectors -->
+                            <div class="tour-input-group">
+                                <div class="tour-label">Who are you?</div>
+                                <div class="tour-pills-row">
+                                    <div class="tour-role-pill magnetic active"><span style="color:var(--accent-light);">🎯</span> I want work</div>
+                                    <div class="tour-role-pill magnetic"><span style="color:var(--gold);">🏅</span> I coach</div>
+                                    <div class="tour-role-pill magnetic"><span style="color:var(--purple);">🏢</span> We're a company</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tour-action-row">
+                            <button class="btn btn-primary magnetic" style="padding: 0.85rem 2rem; font-size: 1rem; border-radius: 12px; box-shadow: 0 10px 25px var(--accent-glow);">Get started free <span style="margin-left:4px;">→</span></button>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">No credit card · Free forever</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    <script>
+    
+document.addEventListener("DOMContentLoaded", () => {
+    // 1. ADVANCED CUBE PHYSICS
+    const zenCube = document.querySelector('.cube');
+    const cubeScene = document.getElementById('cube-scene');
+    
+    let currentScroll = window.scrollY;
+    let targetScroll = window.scrollY;
+    let mouseX = 0; let mouseY = 0;
+    let lastScrollY = window.scrollY;
+    let scrollVelocity = 0;
+    let ambientTime = 0; 
+    
+    window.addEventListener('scroll', () => {
+        targetScroll = window.scrollY;
+        if (window.scrollY > 150) document.body.classList.add('is-scrolled');
+        else document.body.classList.remove('is-scrolled');
+    });
+    
+    window.addEventListener('mousemove', (e) => {
+        mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+        mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+    });
+    
+    function render3D() {
+        ambientTime += 0.15; 
+        const delta = window.scrollY - lastScrollY;
+        scrollVelocity = scrollVelocity * 0.9 + delta * 0.1; 
+        lastScrollY = window.scrollY;
+        currentScroll += (targetScroll - currentScroll) * 0.05; 
+        
+        if (zenCube) {
+            const speedFactor = Math.abs(scrollVelocity);
+            const warpScaleY = 1 + speedFactor * 0.005; 
+            const extraSpinX = scrollVelocity * 0.2; 
+            const extraSpinY = scrollVelocity * 0.2; 
+            const rotX = (currentScroll * 0.1) + ambientTime + extraSpinX + (mouseY * 15);
+            const rotY = (currentScroll * 0.15) + (ambientTime * 1.5) + extraSpinY + (mouseX * 15);
+            zenCube.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1, ${warpScaleY}, 1)`;
+        }
+        
+        if (cubeScene) {
+            cubeScene.style.transform = `rotateX(${mouseY * 15}deg) rotateY(${mouseX * 15}deg)`;
+        }
+        requestAnimationFrame(render3D);
+    }
+    render3D();
+
+    // 2. MAGNETIC MICRO-INTERACTIONS
+    document.querySelectorAll('.magnetic').forEach(el => {
+        el.addEventListener('mousemove', e => {
+            const rect = el.getBoundingClientRect();
+            const hx = rect.left + rect.width / 2;
+            const hy = rect.top + rect.height / 2;
+            const dx = (e.clientX - hx) * 0.2; 
+            const dy = (e.clientY - hy) * 0.2;
+            el.style.transform = `translate(${dx}px, ${dy}px) scale(1.03)`;
+        });
+        el.addEventListener('mouseleave', () => { el.style.transform = ''; });
+    });
+
+    // 3. 3D CARD HOVER PHYSICS
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
+            const centerX = rect.width / 2; 
+            const centerY = rect.height / 2;
+            const tiltX = ((y - centerY) / centerY) * -4; 
+            const tiltY = ((x - centerX) / centerX) * 4;
+            card.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(1.02, 1.02, 1.02)`;
+        });
+        card.addEventListener('mouseleave', () => { 
+            card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`; 
+        });
+    });
+
+    // 4. NAVIGATION TRACKER
+    const cubeWrapper = document.querySelector('.cube-wrapper');
+    function updateLamp() {
+        const activeItem = document.querySelector('.vnav-item.active');
+        const lamp = document.getElementById('vnav-lamp');
+        if(activeItem && lamp) {
+            const containerRect = document.querySelector('.vnav').getBoundingClientRect();
+            const itemRect = activeItem.getBoundingClientRect();
+            lamp.style.top = `${(itemRect.top - containerRect.top) + (itemRect.height / 2) - 8}px`;
+        }
+    }
+
+    const sections = Array.from(document.querySelectorAll('section[id]'));
+    window.addEventListener('scroll', () => {
+        let activeId = '';
+        const scrollFocusPoint = window.scrollY + (window.innerHeight * 0.4); 
+        
+        sections.forEach(sec => {
+            const top = sec.offsetTop;
+            const bottom = top + sec.offsetHeight;
+            if (scrollFocusPoint >= top && scrollFocusPoint <= bottom) {
+                activeId = sec.getAttribute('id');
+            }
+        });
+        
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) {
+            activeId = sections[sections.length - 1].getAttribute('id');
+        }
+
+        if (activeId) {
+            document.querySelectorAll('.vnav-item').forEach(nav => {
+                if (nav.dataset.target === activeId) nav.classList.add('active');
+                else nav.classList.remove('active');
+            });
+            updateLamp();
+            
+            // Update Cube Evolution Stage
+            let stage = 1;
+            if (['welcome', 'how-it-works', 'why'].includes(activeId)) stage = 1;
+            else if (['jobs', 'cv'].includes(activeId)) stage = 2;
+            else if (['story', 'pitch', 'courses'].includes(activeId)) stage = 3;
+            else if (['certificates', 'coaches', 'scores', 'pricing'].includes(activeId)) stage = 4;
+            else if (['tour-end'].includes(activeId)) stage = 5;
+            
+            if (cubeWrapper && !cubeWrapper.classList.contains(`stage-${stage}`)) {
+                cubeWrapper.classList.remove('stage-1', 'stage-2', 'stage-3', 'stage-4', 'stage-5');
+                cubeWrapper.classList.add(`stage-${stage}`);
+            }
+        }
+    });
+
+    // 5. STAGGERED REVEAL ANIMATIONS
+    const observerOptions = { threshold: 0.15, rootMargin: "0px 0px -10% 0px" };
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) {
+                entry.target.classList.add('in-view');
+            }
+        });
+    }, observerOptions);
+    document.querySelectorAll('.anim-up, .anim-blur, .anim-scale').forEach(el => observer.observe(el));
+    
+    // Smooth scroll for VNav
+    document.querySelectorAll('.vnav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const target = document.getElementById(item.dataset.target);
+            if (target) target.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    setTimeout(updateLamp, 100);
+});
+
+    </script>
+</body>
+</html>
